@@ -1,0 +1,11 @@
+reset;
+model primal_SVM.mod;
+data SVM.dat;
+show;
+expand;
+option solver cplex;
+solve;
+display w, gamma, s;
+
+
+	
