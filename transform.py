@@ -14,7 +14,7 @@ def read_points(input_: str) -> list[Point]:
     return points
 
 
-def write(output: str, points: list[Point]) -> None:
+def write_ampl(output: str, points: list[Point]) -> None:
     with open(output, 'w') as file:
         file.write("\n")
         file.write("# Samples and dimension \n")
@@ -37,17 +37,34 @@ def write(output: str, points: list[Point]) -> None:
         file.write(";\n")
 
 
-def main(input_: str, output: str) -> None:
+def write_normal(output: str, points: list[Point]) -> None:
+    with open(output, 'w') as file:
+        for features, label in points:
+            file.write(' '.join(map(str, features)) + f" {label}\n")
+
+
+def split_data(points: list[Point], test_ratio: float) -> tuple[list[Point], list[Point]]:
+    split_index = int(len(points) * (1 - test_ratio))
+    train_points = points[:split_index]
+    test_points = points[split_index:]
+    return train_points, test_points
+
+
+def main(input_: str, output: str, test_ratio: float) -> None:
     points = read_points(input_)
-    write(output, points)
+    train_set, test_set = split_data(points, test_ratio)
+    write_ampl(output+"_train_AMPL.dat", train_set)
+    write_normal(output+"_train_PLAIN.dat", train_set)
+    write_normal(output+"_test_PLAIN.dat", test_set)
     print("OK")
     
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("python transform.py input output")
+    if len(sys.argv) != 4:
+        print("python transform.py input output_name test_ratio")
         sys.exit(1)
     
     input_= sys.argv[1]
-    output = sys.argv[2]
-    main(input_, output)
+    output= sys.argv[2]
+    test_ratio = float(sys.argv[3])
+    main(input_, output, test_ratio)

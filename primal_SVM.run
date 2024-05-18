@@ -1,6 +1,6 @@
 reset;
 model primal_SVM.mod;
-data SVM.dat;
+data SVM_train_AMPL.dat;
 show;
 expand;
 option solver cplex;
