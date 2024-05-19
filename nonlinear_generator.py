@@ -13,7 +13,7 @@ def save_dataset(points, labels, filename) -> None:
 
 
 def generate_swiss(size=400):
-    x, t = make_swiss_roll(n_samples=size)
+    x, t = make_swiss_roll(n_samples=size, random_state=1234)
     labels = np.where(t < np.mean(t), 1, -1)    # values below mean of t are a class
     return x, labels
 
