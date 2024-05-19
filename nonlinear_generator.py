@@ -2,12 +2,11 @@ from sklearn.datasets import make_swiss_roll
 import numpy as np
 
 
-
 FILENAME = "nonlinear.dat"
 
 def save_dataset(points, labels, filename) -> None:
     assert len(points) == len(labels)
-    # Crear y escribir en el archivo .dat
+
     with open(filename, "w") as file:
         for point, label in zip(points, labels):
             file.write(" ".join(map(str, point)) + " " + str(label) + "\n")
@@ -15,7 +14,7 @@ def save_dataset(points, labels, filename) -> None:
 
 def generate_swiss(size=400):
     x, t = make_swiss_roll(n_samples=size)
-    labels = np.where(t < np.mean(t), 1, -1)    # values below mean or median of t are a class
+    labels = np.where(t < np.mean(t), 1, -1)    # values below mean of t are a class
     return x, labels
 
 
