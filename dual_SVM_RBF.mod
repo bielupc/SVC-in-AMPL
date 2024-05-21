@@ -8,8 +8,7 @@ param y {1..m};	# classification
 param A {1..m, 1..n};
 
 #Kernel
-param K {i in 1..m, j in 1..m} :=
-    sum {k in 1..n} A[i, k] * A[j, k];
+param K{1..m, 1..m} := exp(-sum{k in 1..n} (A[i, k] - A[j, k])^2 / (2 * sigma^2));
 
 # Define the variables
 var la {1..m} >= 0, <= nu;
