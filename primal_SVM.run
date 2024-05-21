@@ -46,11 +46,17 @@ for {i in nus} {
     
     display train_correct/m_train;
     display test_correct/m_test;
-
+    
     display nu;
+    
+    display w;
+    display gamma;
 
-
-
+	# Reset just in case
+	let {k in 1..n_train} w[k] := 0;
+    let gamma := 0;
+    let {j in 1..m_train} s[j] := 0;
+    
 
 }
 
