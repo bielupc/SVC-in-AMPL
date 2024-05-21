@@ -1,10 +1,11 @@
 
 # Samples and dimension 
-param m := 280;
-param n := 4;
+param m_train := 280;
+param n_train := 4;
+
 
 # Points
-param A : 1 2 3 4 :=
+param A_train : 1 2 3 4 :=
 1 0.201 0.165 0.228 0.348
 2 0.879 0.599 0.772 0.091
 3 0.58 0.341 0.2 0.495
@@ -288,7 +289,7 @@ param A : 1 2 3 4 :=
 ;
 
 # Labels
-param y :=
+param y_train :=
 1 -1.0
 2 1.0
 3 -1.0

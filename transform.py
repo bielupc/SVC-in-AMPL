@@ -14,22 +14,22 @@ def read_points(input_: str) -> list[Point]:
     return points
 
 
-def write_ampl(output: str, points: list[Point]) -> None:
+def write_ampl(output: str, points: list[Point], split: str) -> None:
     with open(output, 'w') as file:
         file.write("\n")
         file.write("# Samples and dimension \n")
-        file.write("param m := {};\n".format(len(points)))
-        file.write("param n := {};\n".format(len(points[0][0])))
+        file.write("param m_{} := {};\n".format(split, len(points)))
+        file.write("param n_{} := {};\n".format(split, len(points[0][0])))
         file.write("\n")
         file.write("\n")
         file.write("# Points\n")
-        file.write("param A : " + ' '.join(map(str, range(1, len(points[0][0]) + 1))) + " :=\n")
+        file.write(f"param A_{split} : " + ' '.join(map(str, range(1, len(points[0][0]) + 1))) + " :=\n")
         for i, (features, label) in enumerate(points, start=1):
             file.write("{} {}\n".format(i, ' '.join(map(str, features))))
         file.write(";\n")
         file.write("\n")
         file.write("# Labels\n")
-        file.write("param y :=\n")
+        file.write(f"param y_{split} :=\n")
         for i, (_, label) in enumerate(points, start=1):
             file.write("{} {}\n".format(i, label))
         file.write(";\n")
@@ -51,7 +51,8 @@ def split_data(points: list[Point], test_ratio: float) -> tuple[list[Point], lis
 def main(input_: str, output: str, test_ratio: float) -> None:
     points = read_points(input_)
     train_set, test_set = split_data(points, test_ratio)
-    write_ampl(output+"_train_AMPL.dat", train_set)
+    write_ampl(output+"_train_AMPL.dat", train_set, "train")
+    write_ampl(output+"_test_AMPL.dat", test_set, "test")
     write_normal(output+"_train_PLAIN.dat", train_set)
     write_normal(output+"_test_PLAIN.dat", test_set)
     print("OK")
