@@ -21,8 +21,6 @@ def write_ampl(output: str, points: list[Point]) -> None:
         file.write("param m := {};\n".format(len(points)))
         file.write("param n := {};\n".format(len(points[0][0])))
         file.write("\n")
-        file.write("# Hyperparam\n")
-        file.write("param nu := 30;\n")
         file.write("\n")
         file.write("# Points\n")
         file.write("param A : " + ' '.join(map(str, range(1, len(points[0][0]) + 1))) + " :=\n")
