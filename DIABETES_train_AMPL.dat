@@ -3,9 +3,6 @@
 param m := 537;
 param n := 8;
 
-# Hyperparam
-param nu := 30;
-
 # Points
 param A : 1 2 3 4 5 6 7 8 :=
 1 6.0 148.0 72.0 35.0 0.0 33.6 0.627 50.0

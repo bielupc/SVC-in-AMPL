@@ -1,7 +1,6 @@
 # Read the parameters
 param n;
 param m;
-param nu;
 
 # Read data and labels
 param A {1..m, 1..n};
