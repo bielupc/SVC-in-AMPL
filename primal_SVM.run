@@ -50,6 +50,8 @@ for {i in nus} {
     display nu;
     
     display w;
+    display sqrt(sum {k in 1..n_train} w[k]^2);
+    
     display gamma;
 
 	# Reset just in case
