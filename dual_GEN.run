@@ -3,9 +3,9 @@ reset;
 # Fixed hyperparameters
 param nu := 50; 
 
-# Load model and data 
+# Load model and data
 model "models/dual_SVM.mod";
-data "data/diabetes/DIABETES_train_AMPL.dat";
+data "data/generated/GEN_train_AMPL.dat";
 option solver cplex;
 option cplex_options 'timing=1';
 
@@ -19,7 +19,7 @@ param n_test;
 param m_test;
 param A_test {0..m_test, 1..n_test};
 param y_test {0..m_test};
-data "data/diabetes/DIABETES_test_AMPL.dat";
+data "data/generated/GEN_test_AMPL.dat";
 
 # Primal retrieval parameters
 param gamma;

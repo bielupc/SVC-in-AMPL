@@ -3,12 +3,12 @@ reset;
 # Fixed hyperparameters
 param nu := 50; 
 
-
-# Load for training
-model dual_SVM.mod;
-data SVM_train_AMPL.dat;
+# Load model and data
+model "models/dual_SVM.mod";
+data "data/nonlinear/NONLINEAR_train_AMPL.dat";
 option solver cplex;
 option cplex_options 'timing=1';
+
 # Parameters for accuracy
 param train_correct;
 param test_correct;
@@ -19,28 +19,25 @@ param n_test;
 param m_test;
 param A_test {0..m_test, 1..n_test};
 param y_test {0..m_test};
-data SVM_test_AMPL.dat;
+data "data/nonlinear/NONLINEAR_test_AMPL.dat";
 
-# Primal retrieval
+# Primal retrieval parameters
 param gamma;
 param w {j in 1..n_train};
 
-#param sigma := sqrt (n_train /2);
-#param K_test {i in 1..m_test, j in 1..m_test} = exp(-sum{k in 1..n_train} (A_test[i, k] - A_test[j, k])^2 / (2 * sigma^2)); 
-
-#show;
-#expand;
+# SOLVE
+show;
+expand;
 solve;
-#display la;
+display la;
 
-
-# w
+# WEIGHTS
 for {j in 1..n_train} {
 	let w[j] := sum {i in 1..m_train} la[i] * A_train[i,j] * y_train[i];
 }
 display w;
 
-# gamma
+# GAMMA 
 for {i in 1..m_train} {
     if la[i] > 0.00001 and la[i] < nu - 0.00001 then {
         let gamma := 1/y_train[i] - sum {j in 1..n_train} w[j] *  A_train[i,j];
@@ -65,6 +62,6 @@ let test_correct := 0;
         let test_correct := test_correct + 1;
 }
 
+display la;
 display train_correct/m_train;
 display test_correct/m_test;
-display nu;

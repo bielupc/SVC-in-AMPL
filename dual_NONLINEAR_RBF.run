@@ -3,15 +3,12 @@ reset;
 # Fixed hyperparameters
 param nu := 50; 
 
-# Load for training
-
-
-model dual_NONLINEAR_RBF.mod;
-data NONLINEAR_train_AMPL.dat;
-
-
+# Load model and data
+model "models/dual_RBF_SVM.mod";
+data "data/nonlinear/NONLINEAR_train_AMPL.dat";
 option solver cplex;
 option cplex_options 'timing=1';
+
 # Parameters for accuracy
 param train_correct;
 param test_correct;
@@ -22,14 +19,13 @@ param n_test;
 param m_test;
 param A_test {0..m_test, 1..n_test};
 param y_test {0..m_test};
-data NONLINEAR_test_AMPL.dat;
-
-# Primal retrieval
-param gamma;
-param w {j in 1..n_train};
+data "data/nonlinear/NONLINEAR_test_AMPL.dat";
 
 
-#param K_test {i in 1..m_test, j in 1..m_test} = exp(-sum{k in 1..n_train} (A_test[i, k] - A_test[j, k])^2 / (2 * sigma^2)); 
+
+
+# -------
+param K_test {i in 1..m_test, j in 1..m_test} = exp(-sum{k in 1..n_train} (A_test[i, k] - A_test[j, k])^2 / (2 * sigma^2)); 
 
 #show;
 #expand;

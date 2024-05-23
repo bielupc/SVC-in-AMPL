@@ -1,24 +1,28 @@
 reset;
 
+# Hyperparameters
 set nus := {0.1, 0.5, 1, 2, 5, 10, 50, 100};
 param nu;
-model primal_SVM.mod;
-data DIABETES_train_AMPL.dat;
+
+# Load model and data
+model "models/primal_SVM.mod";
+data "data/diabetes/DIABETES_train_AMPL.dat";
 option solver cplex;
 option cplex_options 'timing=1';
+
+# Parameters for accuracy
 param train_correct;
 param test_correct;
+param y_pred;
 
+# Load test data and parameters
 param n_test;
 param m_test;
 param A_test {0..m_test, 1..n_test};
 param y_test {0..m_test};
-data DIABETES_test_AMPL.dat;
+data "data/diabetes/DIABETES_test_AMPL.dat";
 
-
-
-param y_pred;
-
+# Optmize for every nu
 for {i in nus} {
     let nu := i;
 	#show;
@@ -28,7 +32,6 @@ for {i in nus} {
 
     # TRAIN ACCURACY
     let train_correct := 0;
-
     for { j in 1..m_train} {
         let y_pred := if sum {k in 1..n_train} w[k]*A_train[j,k] + gamma > 0 then 1 else -1;
         if y_pred = y_train[j] then
@@ -37,7 +40,6 @@ for {i in nus} {
     
     # TEST ACCURACY
     let test_correct := 0;
-    
      for { j in 1..m_test} {
         let y_pred := if sum {k in 1..n_test} w[k]*A_test[j,k] + gamma > 0 then 1 else -1;
         if y_pred = y_test[j] then
@@ -46,18 +48,14 @@ for {i in nus} {
     
     display train_correct/m_train;
     display test_correct/m_test;
-    
     display nu;
-    
     display w;
-    display sqrt(sum {k in 1..n_train} w[k]^2);
+    display sqrt(sum {k in 1..n_train} w[k]^2); # w norm
     display gamma;
-
-	# Reset just in case
+    
+ 	# Reset just in case
 	let {k in 1..n_train} w[k] := 0;
     let gamma := 0;
     let {j in 1..m_train} s[j] := 0;
-    
-
 }
 
