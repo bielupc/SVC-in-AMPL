@@ -27,8 +27,8 @@ data "data/nonlinear/NONLINEAR_test_AMPL.dat";
 for {nu_i in nus} {
     let nu := nu_i;
     # SOLVE
-    show;
-    expand;
+    # show;
+    # expand;
     solve;
 
     # SUPPORT VECTOR
@@ -66,7 +66,8 @@ for {nu_i in nus} {
             let test_correct := test_correct + 1;
     }
 
-    display la;
+    # display la;
     display train_correct/m_train;
     display test_correct/m_test;
+    display nu;
 }

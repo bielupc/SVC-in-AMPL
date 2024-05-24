@@ -29,10 +29,10 @@ param w {j in 1..n_train};
 for {nu_i in nus} {
     let nu := nu_i;
     # SOLVE
-    show;
-    expand;
+    # show;
+    # expand;
     solve;
-    display la;
+    # display la;
 
     # WEIGHTS
     for {j in 1..n_train} {
@@ -48,6 +48,7 @@ for {nu_i in nus} {
         }
     }
     display gamma;
+    display sqrt(sum {k in 1..n_train} w[k]^2); # w norm
 
     # TRAIN ACCURACY
     let train_correct := 0;
@@ -65,7 +66,7 @@ for {nu_i in nus} {
             let test_correct := test_correct + 1;
     }
 
-    display la;
+    display nu;
     display train_correct/m_train;
     display test_correct/m_test;
 }
