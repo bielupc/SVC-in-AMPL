@@ -45,7 +45,11 @@ for {i in 1..m_train} {
 # TRAIN ACCURACY
 let train_correct := 0;
 for { k in 1..m_train} {
-    let y_pred := if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[i, j])^2 / (2 * sigma^2)) + 1/y_train[sv] -  sum {i in 1..m_train} la[i] * exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[sv, j])^2 / (2 * sigma^2))  > 0 then 1 else -1;
+    if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[i, j])^2 / (2 * sigma^2)) + 1/y_train[sv] -  sum {i in 1..m_train} la[i] * exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[sv, j])^2 / (2 * sigma^2))  > 0 then
+        let y_pred := 1;
+    else
+        let y_pred := -1;
+        
     if y_pred = y_train[k] then
         let train_correct := train_correct + 1;
 }
