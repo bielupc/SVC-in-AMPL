@@ -14,6 +14,7 @@ param train_correct;
 param test_correct;
 param y_pred;
 param sv;
+param gamma;
 
 # Load test data and parameters
 param n_test;
@@ -22,16 +23,10 @@ param A_test {0..m_test, 1..n_test};
 param y_test {0..m_test};
 data "data/nonlinear/NONLINEAR_test_AMPL.dat";
 
-
-
-
 # SOLVE
 show;
 expand;
 solve;
-
-
-param K_test {i in 1..m_test, j in 1..m_test} = exp(-sum{k in 1..n_train} (A_test[i, k] - A_test[j, k])^2 / (2 * sigma^2)); 
 
 # SUPPORT VECTOR
 for {i in 1..m_train} {
@@ -41,11 +36,13 @@ for {i in 1..m_train} {
 	}
 }
 
+# GAMMA
+let gamma := 1/y_train[sv] -  sum {i in 1..m_train} la[i] * exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[sv, j])^2 / (2 * sigma^2));
 
 # TRAIN ACCURACY
 let train_correct := 0;
 for { k in 1..m_train} {
-    if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[i, j])^2 / (2 * sigma^2)) + 1/y_train[sv] -  sum {i in 1..m_train} la[i] * exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[sv, j])^2 / (2 * sigma^2))  > 0 then
+    if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[k, j])^2 / (2 * sigma^2)) + gamma > 0 then
         let y_pred := 1;
     else
         let y_pred := -1;
@@ -54,14 +51,18 @@ for { k in 1..m_train} {
         let train_correct := train_correct + 1;
 }
 
-# # TEST ACCURACY
-# let test_correct := 0;
-#     for { j in 1..m_test} {
-#     let y_pred := if sum {k in 1..n_test} w[k]*A_test[j,k] + gamma > 0 then 1 else -1;
-#     if y_pred = y_test[j] then
-#         let test_correct := test_correct + 1;
-# }
+# TEST ACCURACY
+let test_correct := 0;
+for { k in 1..m_test} {
+    if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_test[k, j])^2 / (2 * sigma^2)) + gamma > 0 then
+        let y_pred := 1;
+    else
+        let y_pred := -1;
+        
+    if y_pred = y_test[k] then
+        let test_correct := test_correct + 1;
+}
 
 display la;
 display train_correct/m_train;
-# display test_correct/m_test;
+display test_correct/m_test;
