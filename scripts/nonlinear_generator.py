@@ -43,8 +43,8 @@ def main():
     else:
         x, labels = generate_swiss(int(inp))
 
-    plot_swiss(x, labels)
-    #save_dataset(x, labels, FILENAME)
+    #plot_swiss(x, labels)
+    save_dataset(x, labels, FILENAME)
         
 
 if __name__ == "__main__":
