@@ -1,7 +1,8 @@
 reset;
 
-# Fixed hyperparameters
-param nu := 50; 
+# Hyperparameters
+set nus := {0.1, 0.5, 1, 2, 5, 10, 50, 100};
+param nu;
 
 # Load model and data
 model "models/dual_RBF_SVM.mod";
@@ -23,46 +24,49 @@ param A_test {0..m_test, 1..n_test};
 param y_test {0..m_test};
 data "data/nonlinear/NONLINEAR_test_AMPL.dat";
 
-# SOLVE
-show;
-expand;
-solve;
+for {nu_i in nus} {
+    let nu := nu_i;
+    # SOLVE
+    show;
+    expand;
+    solve;
 
-# SUPPORT VECTOR
-for {i in 1..m_train} {
-    if la[i] > 0.00001 and la[i] < nu - 0.00001 then {
-        let sv := i;
-        break;
-	}
+    # SUPPORT VECTOR
+    for {i in 1..m_train} {
+        if la[i] > 0.00001 and la[i] < nu - 0.00001 then {
+            let sv := i;
+            break;
+        }
+    }
+
+    # GAMMA
+    let gamma := 1/y_train[sv] -  sum {i in 1..m_train} la[i] * exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[sv, j])^2 / (2 * sigma^2));
+
+    # TRAIN ACCURACY
+    let train_correct := 0;
+    for { k in 1..m_train} {
+        if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[k, j])^2 / (2 * sigma^2)) + gamma > 0 then
+            let y_pred := 1;
+        else
+            let y_pred := -1;
+            
+        if y_pred = y_train[k] then
+            let train_correct := train_correct + 1;
+    }
+
+    # TEST ACCURACY
+    let test_correct := 0;
+    for { k in 1..m_test} {
+        if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_test[k, j])^2 / (2 * sigma^2)) + gamma > 0 then
+            let y_pred := 1;
+        else
+            let y_pred := -1;
+            
+        if y_pred = y_test[k] then
+            let test_correct := test_correct + 1;
+    }
+
+    display la;
+    display train_correct/m_train;
+    display test_correct/m_test;
 }
-
-# GAMMA
-let gamma := 1/y_train[sv] -  sum {i in 1..m_train} la[i] * exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[sv, j])^2 / (2 * sigma^2));
-
-# TRAIN ACCURACY
-let train_correct := 0;
-for { k in 1..m_train} {
-    if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_train[k, j])^2 / (2 * sigma^2)) + gamma > 0 then
-        let y_pred := 1;
-    else
-        let y_pred := -1;
-        
-    if y_pred = y_train[k] then
-        let train_correct := train_correct + 1;
-}
-
-# TEST ACCURACY
-let test_correct := 0;
-for { k in 1..m_test} {
-    if sum {i in 1..m_train} la[i] * y_train[i] *  exp(-sum{j in 1..n_train} (A_train[i, j] - A_test[k, j])^2 / (2 * sigma^2)) + gamma > 0 then
-        let y_pred := 1;
-    else
-        let y_pred := -1;
-        
-    if y_pred = y_test[k] then
-        let test_correct := test_correct + 1;
-}
-
-display la;
-display train_correct/m_train;
-display test_correct/m_test;

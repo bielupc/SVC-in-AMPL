@@ -23,8 +23,8 @@ param y_test {0..m_test};
 data "data/generated/GEN_test_AMPL.dat";
 
 # Optmize for every nu
-for {i in nus} {
-    let nu := i;
+for {nu_i in nus} {
+    let nu := nu_i;
 	#show;
 	#expand;
     solve;

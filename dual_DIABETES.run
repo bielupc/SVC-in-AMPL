@@ -1,7 +1,8 @@
 reset;
 
-# Fixed hyperparameters
-param nu := 50; 
+# Hyperparameters
+set nus := {0.1, 0.5, 1, 2, 5, 10, 50, 100};
+param nu;
 
 # Load model and data 
 model "models/dual_SVM.mod";
@@ -25,43 +26,46 @@ data "data/diabetes/DIABETES_test_AMPL.dat";
 param gamma;
 param w {j in 1..n_train};
 
-# SOLVE
-show;
-expand;
-solve;
+for {nu_i in nus} {
+    let nu := nu_i;
+    # SOLVE
+    show;
+    expand;
+    solve;
 
 
-# WEIGHTS
-for {j in 1..n_train} {
-	let w[j] := sum {i in 1..m_train} la[i] * A_train[i,j] * y_train[i];
+    # WEIGHTS
+    for {j in 1..n_train} {
+        let w[j] := sum {i in 1..m_train} la[i] * A_train[i,j] * y_train[i];
+    }
+    display w;
+
+    # GAMMA 
+    for {i in 1..m_train} {
+        if la[i] > 0.00001 and la[i] < nu - 0.00001 then {
+            let gamma := 1/y_train[i] - sum {j in 1..n_train} w[j] *  A_train[i,j];
+            break;
+        }
+    }
+    display gamma;
+
+    # TRAIN ACCURACY
+    let train_correct := 0;
+    for { j in 1..m_train} {
+        let y_pred := if sum {k in 1..n_train} w[k]*A_train[j,k] + gamma > 0 then 1 else -1;
+        if y_pred = y_train[j] then
+            let train_correct := train_correct + 1;
+    }
+
+    # TEST ACCURACY
+    let test_correct := 0;
+        for { j in 1..m_test} {
+        let y_pred := if sum {k in 1..n_test} w[k]*A_test[j,k] + gamma > 0 then 1 else -1;
+        if y_pred = y_test[j] then
+            let test_correct := test_correct + 1;
+    }
+
+    display la;
+    display train_correct/m_train;
+    display test_correct/m_test;
 }
-display w;
-
-# GAMMA 
-for {i in 1..m_train} {
-    if la[i] > 0.00001 and la[i] < nu - 0.00001 then {
-        let gamma := 1/y_train[i] - sum {j in 1..n_train} w[j] *  A_train[i,j];
-        break;
-	}
-}
-display gamma;
-
-# TRAIN ACCURACY
-let train_correct := 0;
-for { j in 1..m_train} {
-    let y_pred := if sum {k in 1..n_train} w[k]*A_train[j,k] + gamma > 0 then 1 else -1;
-    if y_pred = y_train[j] then
-        let train_correct := train_correct + 1;
-}
-
-# TEST ACCURACY
-let test_correct := 0;
-    for { j in 1..m_test} {
-    let y_pred := if sum {k in 1..n_test} w[k]*A_test[j,k] + gamma > 0 then 1 else -1;
-    if y_pred = y_test[j] then
-        let test_correct := test_correct + 1;
-}
-
-display la;
-display train_correct/m_train;
-display test_correct/m_test;
